@@ -117,12 +117,15 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ---------- 6. 更新右侧列表 ----------
-  function updateStationList(userLocation, nearestCenter, topHighScoreCenters) {
+function updateStationList(userLocation, nearestCenter, topHighScoreCenters) {
   if (!stationListEl || !nearestCenter) return;
 
-  // 小工具：根据距离（英里）估计开车时间（假设 50 mph）
+  // 距离→驾车时间的小工具（假设平均 50 mph）
   const driveMinutesFromMiles = (miles) =>
     Math.round((miles / 50) * 60);
+
+  // 布尔值转 Y / N
+  const boolToYN = (v) => (v ? "Y" : "N");
 
   let html = "";
 
@@ -153,16 +156,22 @@ document.addEventListener("DOMContentLoaded", function () {
       </span>
 
       <span class="next-drop-off-est">
-        Nearby high-score centers: ${topHighScoreCenters.length}
+        Nearby high-score centers: ${topHighScoreCenters.length} |
+        Nearby POIs (any type): ${nearestPoiCount}
       </span>
 
       <span class="next-pick-up-est">
-        Nearby POIs: ${nearestPoiCount}
+        USA food: ${boolToYN(nearestCenter.hasUSA)} |
+        Asian food: ${boolToYN(nearestCenter.hasAsian)} |
+        Park: ${boolToYN(nearestCenter.hasPark)} |
+        Museum: ${boolToYN(nearestCenter.hasMuseum)} |
+        MVC: ${boolToYN(nearestCenter.hasMVC)}
       </span>
     </li>
   `;
 
   // ---------- 2. High-score center #1 / #2 / #3 ----------
+
   topHighScoreCenters.forEach((center, idx) => {
     const distMiNum = center.distanceKm * 0.621371;
     const distMi = distMiNum.toFixed(1);
@@ -190,11 +199,15 @@ document.addEventListener("DOMContentLoaded", function () {
         </span>
 
         <span class="next-drop-off-est">
-          Nearby POIs: ${poiCount}
+          Nearby POIs (any type): ${poiCount}
         </span>
 
         <span class="next-pick-up-est">
-          Click marker on the map to see more
+          USA food: ${boolToYN(center.hasUSA)} |
+          Asian food: ${boolToYN(center.hasAsian)} |
+          Park: ${boolToYN(center.hasPark)} |
+          Museum: ${boolToYN(center.hasMuseum)} |
+          MVC: ${boolToYN(center.hasMVC)}
         </span>
       </li>
     `;
@@ -202,6 +215,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   stationListEl.innerHTML = html;
 }
+
 
 
   // ---------- 7. 地图点击：高亮最近三个高分点 + 更新右侧 ----------
